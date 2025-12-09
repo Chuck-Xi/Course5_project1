@@ -5,7 +5,13 @@ output:
     keep_md: true
 ---
 
+Setting Global options
 
+``` r
+knitr::opts_chunk$set(echo = TRUE, 
+                      warning = FALSE,
+                      message = FALSE)
+```
 
 ## Loading and preprocessing the data
 Importing tidyverse, dataset and converting date.
