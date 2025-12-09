@@ -134,7 +134,7 @@ df_imputed <- df_imputed %>%
         day_type = factor(day_type, levels = c("weekend", "weekday")))
 ```
 
-```{r}
+```{r plot4}
 df_imputed_day_type <- df_imputed %>% 
     group_by(interval, day_type) %>% 
     summarise(avg_steps = mean(steps_filled, na.rm = TRUE)) %>% 

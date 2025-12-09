@@ -195,4 +195,4 @@ g4 <- ggplot(df_imputed_day_type, aes(x = interval, y = avg_steps)) +
 print(g4)
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+![](PA1_template_files/figure-html/plot4-1.png)<!-- -->
