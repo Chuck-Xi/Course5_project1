@@ -27,6 +27,7 @@ Aggregating data to daily frequency and printing summary.
 
 ``` r
 df_daily <- df %>% 
+    filter(!is.na(steps)) %>% 
     group_by(date) %>% 
     summarise(total_steps = sum(steps, na.rm = TRUE))
 
@@ -38,7 +39,7 @@ print(paste("mean total number of steps taken per day:", round(df_daily_summary[
 ```
 
 ```
-## [1] "mean total number of steps taken per day: 9354"
+## [1] "mean total number of steps taken per day: 10766"
 ```
 
 ``` r
@@ -46,14 +47,14 @@ print(paste("median total number of steps taken per day:", round(df_daily_summar
 ```
 
 ```
-## [1] "median total number of steps taken per day: 10395"
+## [1] "median total number of steps taken per day: 10765"
 ```
 
 Histogram of Daily Steps
 
 ``` r
 g <- ggplot(df_daily, aes(x = total_steps)) +
-    geom_histogram(bins = 30, fill = "skyblue", color = "black") +
+    geom_histogram(bins = 20, fill = "skyblue", color = "black") +
     labs(title = "Histogram of Daily Steps",
          x = "Total Daily Steps",
          y = "Count")
@@ -98,13 +99,10 @@ print(paste("interval which has max average steps:", interval_max))
 ```
 
 ## Imputing missing values
-Calculating the number of NA rows.
 
-The result after imputing missing steps shows a histogram that is
-more normally distributed. It also reduces the days with zero steps
-and more accurately shows true zero step days.
-The mean and median also becomes the same as it was previously more
-skewered towards zero.
+#### Strategy for imputing NAs
+- I'm going to impute NAs by using the 5-min interval averages derived above. The 5-min interval will help retain the shape of the activities throughout the day.
+- The process will use the 5-min interval averages if NA is present, otherwise the original steps will be used in a newly derived column called steps_filled.
 
 
 ``` r
@@ -130,10 +128,12 @@ df_daily_imputed <- df_imputed %>%
 ```
 
 Histogram after imputation.
+Compared to the original histogram without imputation of NAs, the histogram below shows more counts in the mean/median step range. This is as expected as the NAs were imputed using the 5-min interval averages.
+
 
 ``` r
 g3 <- ggplot(df_daily_imputed, aes(x = total_steps)) +
-    geom_histogram(bins = 30, fill = "skyblue", color = "black") +
+    geom_histogram(bins = 20, fill = "skyblue", color = "black") +
     labs(title = "Histogram of Daily Imputed Steps",
          x = "Total Daily Imputed Steps",
          y = "Count")
