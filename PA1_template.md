@@ -5,7 +5,7 @@ output:
     keep_md: true
 ---
 
-Setting Global options
+Setting Global Options
 
 ``` r
 knitr::opts_chunk$set(echo = TRUE, 
