@@ -5,15 +5,12 @@ output:
     keep_md: true
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, 
-                      warning = FALSE,
-                      message = FALSE)
-```
+
 
 ## Loading and preprocessing the data
 Importing tidyverse, dataset and converting date.
-```{r importing}
+
+``` r
 library(tidyverse)
 df <- read.csv("activity.csv")
 df$date <- as.Date(df$date)
@@ -21,7 +18,8 @@ df$date <- as.Date(df$date)
 
 ## What is mean total number of steps taken per day?
 Aggregating data to daily frequency and printing summary.
-```{r mean_summary}
+
+``` r
 df_daily <- df %>% 
     group_by(date) %>% 
     summarise(total_steps = sum(steps, na.rm = TRUE))
@@ -31,11 +29,23 @@ df_daily_summary <- df_daily %>%
               median_total = median(total_steps, na.rm = TRUE))
 
 print(paste("mean total number of steps taken per day:", round(df_daily_summary[[1]], 0)))
+```
+
+```
+## [1] "mean total number of steps taken per day: 9354"
+```
+
+``` r
 print(paste("median total number of steps taken per day:", round(df_daily_summary[[2]], 0)))
 ```
 
+```
+## [1] "median total number of steps taken per day: 10395"
+```
+
 Histogram of Daily Steps
-```{r plot1}
+
+``` r
 g <- ggplot(df_daily, aes(x = total_steps)) +
     geom_histogram(bins = 30, fill = "skyblue", color = "black") +
     labs(title = "Histogram of Daily Steps",
@@ -44,9 +54,12 @@ g <- ggplot(df_daily, aes(x = total_steps)) +
 print(g)
 ```
 
+![](PA1_template_files/figure-html/plot1-1.png)<!-- -->
+
 ## What is the average daily activity pattern?
 Average Daily Activity Pattern time series plot.
-```{r plot2}
+
+``` r
 df_interval <- df %>% 
     group_by(interval) %>% 
     summarise(avg_steps = mean(steps, na.rm = TRUE)) %>% 
@@ -62,13 +75,20 @@ g2 <- ggplot(df_interval, aes(x = interval, y = avg_steps)) +
 print(g2)
 ```
 
+![](PA1_template_files/figure-html/plot2-1.png)<!-- -->
+
 5-minute interval, on average across all the days in the dataset, that contains the maximum number of steps.
 
-```{r interval_max}
+
+``` r
 interval_max <- df_interval %>% 
     slice_max(avg_steps, n = 1) %>% 
     pull(interval)
 print(paste("interval which has max average steps:", interval_max))
+```
+
+```
+## [1] "interval which has max average steps: 835"
 ```
 
 ## Imputing missing values
@@ -80,13 +100,20 @@ and more accurately shows true zero step days.
 The mean and median also becomes the same as it was previously more
 skewered towards zero.
 
-```{r imputation}
+
+``` r
 missing_values <- df %>% 
     filter(is.na(steps)) %>% 
     nrow()
 
 print(paste("number of missing values:", missing_values))
+```
 
+```
+## [1] "number of missing values: 2304"
+```
+
+``` r
 df_imputed <- df %>% 
     left_join(df_interval, by = "interval") %>% 
     mutate(steps_filled = if_else(is.na(steps), avg_steps, steps))
@@ -97,7 +124,8 @@ df_daily_imputed <- df_imputed %>%
 ```
 
 Histogram after imputation.
-```{r plot3}
+
+``` r
 g3 <- ggplot(df_daily_imputed, aes(x = total_steps)) +
     geom_histogram(bins = 30, fill = "skyblue", color = "black") +
     labs(title = "Histogram of Daily Imputed Steps",
@@ -106,15 +134,28 @@ g3 <- ggplot(df_daily_imputed, aes(x = total_steps)) +
 print(g3)
 ```
 
+![](PA1_template_files/figure-html/plot3-1.png)<!-- -->
+
 Summary of mean and median after imputation.
-```{r imputed_summary}
+
+``` r
 df_daily_imputed_summary <- df_daily_imputed %>% 
     summarise(mean_total = mean(total_steps, na.rm = TRUE),
               median_total = median(total_steps, na.rm = TRUE))
 
 print(paste("Summary of mean imputation:", round(df_daily_imputed_summary[[1]], 0)))
+```
 
+```
+## [1] "Summary of mean imputation: 10766"
+```
+
+``` r
 print(paste("Summary of median imputation:", round(df_daily_imputed_summary[[2]], 0)))
+```
+
+```
+## [1] "Summary of median imputation: 10766"
 ```
 
 ## Are there differences in activity patterns between weekdays and weekends?
@@ -124,7 +165,8 @@ Yes, there are noticeable differences in activity patterns:
 - **Weekends show higher overall activity during the daytime**, particularly between **10 AM and 5 PM**.
 - **Weekdays have a higher peak 5-minute interval**, with a maximum of about **230 steps at interval 835**, compared to about **167 steps at interval 915** on weekends.
 
-```{r}
+
+``` r
 df_imputed <- df_imputed %>% 
     mutate(
         day_type = if_else(
@@ -134,7 +176,8 @@ df_imputed <- df_imputed %>%
         day_type = factor(day_type, levels = c("weekend", "weekday")))
 ```
 
-```{r}
+
+``` r
 df_imputed_day_type <- df_imputed %>% 
     group_by(interval, day_type) %>% 
     summarise(avg_steps = mean(steps_filled, na.rm = TRUE)) %>% 
@@ -151,3 +194,5 @@ g4 <- ggplot(df_imputed_day_type, aes(x = interval, y = avg_steps)) +
 
 print(g4)
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
